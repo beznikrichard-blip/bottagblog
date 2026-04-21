@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة تحكم البوت - زكي</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #121212; color: white; margin: 0; }
+        .card { background: #1e1e1e; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; width: 300px; }
+        button { background: #007bff; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 18px; cursor: pointer; transition: 0.3s; width: 100%; }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #555; cursor: not-allowed; }
+        #status { margin-top: 20px; font-size: 14px; color: #bbb; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>التحكم في النشر</h2>
+    <p>اضغط للتشغيل الفوري</p>
+    <button id="runBtn">🚀 تشغيل البوت الآن</button>
+    <div id="status">جاهز للإرسال...</div>
+</div>
+
+<script>
+    // إعداداتك الخاصة (قم بتغييرها)
+    const GITHUB_TOKEN = "ضع_هنا_الـ_PAT_TOKEN_الخاص_بك"; 
+    const USERNAME = "اسم_حسابك_على_جيت_هاب";
+    const REPO = "اسم_المستودع_الخاص_بالبوت";
+
+    document.getElementById('runBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('runBtn');
+        const status = document.getElementById('status');
+        
+        btn.disabled = true;
+        status.innerText = "جاري إرسال الإشارة...";
+
+        try {
+            const response = await fetch(`https://api.github.com/repos/${USERNAME}/${REPO}/dispatches`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                },
+                body: JSON.stringify({ event_type: 'manual_trigger' })
+            });
+
+            if (response.ok) {
+                status.innerText = "✅ تم تشغيل البوت بنجاح! تفقد المدونة.";
+            } else {
+                status.innerText = "❌ فشل التشغيل. تأكد من الـ Token.";
+            }
+        } catch (error) {
+            status.innerText = "⚠️ خطأ في الاتصال بالإنترنت.";
+        }
+
+        setTimeout(() => { btn.disabled = false; }, 5000);
+    });
+</script>
+
+</body>
+</html>
